@@ -7,30 +7,17 @@ import { useSettingsContext } from '../../app/SettingsContext'
 import { useT } from '../../i18n'
 import { useDashboard } from '../../hooks/useDashboard'
 import { formatPaisa, formatDateTime } from '../../lib/format'
-import { useNavigate } from 'react-router-dom'
-import type { Product, Customer } from '../../types'
 
 export function DashboardPage() {
   const { settings } = useSettingsContext()
   const tr = useT(settings.language)
-  const { stats, loading } = useDashboard()
-  const navigate = useNavigate()
+  const { stats, loading, reload } = useDashboard()
 
   const hour = new Date().getHours()
   const greetingKey =
     hour < 12 ? 'dashboard.greeting.morning'
     : hour < 17 ? 'dashboard.greeting.afternoon'
     : 'dashboard.greeting.evening'
-
-  function handleSaleCommand(product: Product, qty: number) {
-    // Navigate to sales with pre-filled cart
-    navigate('/sales', { state: { quickAdd: { productId: product.id, qty } } })
-  }
-
-  function handleUdhaarCommand(customer: Customer, amountPaisa: number) {
-    // Navigate to udhaar page with customer pre-selected
-    navigate('/udhaar', { state: { recordPayment: { customerId: customer.id, amountPaisa } } })
-  }
 
   return (
     <PageShell>
@@ -48,10 +35,7 @@ export function DashboardPage() {
 
       {/* Command Input */}
       <div className="mb-6">
-        <CommandInput
-          onSaleCommand={handleSaleCommand}
-          onUdhaarCommand={handleUdhaarCommand}
-        />
+        <CommandInput onExecuted={reload} />
       </div>
 
       {/* KPI cards */}
